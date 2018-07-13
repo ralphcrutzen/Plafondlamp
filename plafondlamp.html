@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="http://cdn.jsdelivr.net/timepicker.js/latest/timepicker.min.js"></script>
+    <link href="http://cdn.jsdelivr.net/timepicker.js/latest/timepicker.min.css" rel="stylesheet"/>
+    <style>
+      body {
+        margin: 2em;
+      }
+      #colorpicker {
+        height: 5em;
+        width: 5em;
+        padding: 0;
+        display: none;
+      }
+      #time {
+        display: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Loyc's Lamp</h1>
+
+    <h2>Kleur</h2>
+    <select id="mode" onchange="changeMode()">
+      <option value="rainbow">Regenboog
+      <option value="disco">Disco
+      <option value="select">Kies een kleur
+      <option value="sleep">Inslapen
+    </select>
+    <br>
+    <input id="colorpicker" type="color" value="#000000" onchange="showColor(this.value)" />
+
+    <h2>Wekker</h2>
+    <input type="checkbox" name="alarm" onchange="changeAlarm(this.checked)"/>Aan<br />
+    <input id="time" type="text" placeholder="Klik hier">
+
+    <script type="text/javascript">
+      function showColor(newColor) {
+        sendToParticle('sendcolor', newColor)
+      }
+
+      function changeMode() {
+        var mode = document.getElementById("mode").value;
+        if (mode == "rainbow") {
+          document.getElementById("colorpicker").style.display = "none";
+          sendToParticle('sendmode', 'rainbow');
+        }
+        else if (mode == "select") {
+          document.getElementById("colorpicker").style.display = "inline";
+          sendToParticle('sendmode', 'select');
+        }
+        else if (mode == "sleep") {
+          document.getElementById("colorpicker").style.display = "none";
+          sendToParticle('sendmode', 'sleep');
+        }
+        else if (mode == "disco") {
+          document.getElementById("colorpicker").style.display = "none";
+          sendToParticle('sendmode', 'disco');
+        }
+      }
+
+      function changeAlarm(checked) {
+        if (checked) {
+          document.getElementById('time').style.display = 'inline';
+          sendToParticle('sendalarm', 'on');
+        }
+        else {
+          document.getElementById('time').style.display = 'none';
+          sendToParticle('sendalarm', 'off');
+        }
+      }
+
+      function setAlarm(h, m) {
+        sendToParticle('sendhour', date.hour().toString());
+        sendToParticle('sendminute', date.minute().toString());
+      }
+
+      function sendToParticle(func, val) {
+        var request = new XMLHttpRequest();
+        var dev_id = 'zet hier je device-id';
+        var access = 'zet hier je access token';
+        var data = 'params='+val+'&access_token='+access;
+        var url = 'https://api.particle.io/v1/devices/' + dev_id + '/' + func + '/';
+        request.open('POST', url, true);
+        request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+        request.send(data);
+      }
+
+          var timepicker = new TimePicker('time', {
+          lang: 'en',
+          theme: 'dark'
+        });
+
+        var input = document.getElementById('time');
+        var hour = 0;
+        var minute = 0;
+
+        timepicker.on('change', function(evt) {
+          var value = (evt.hour || '00') + ':' + (evt.minute || '00');
+          evt.element.value = value;
+          hour = evt.hour;
+          minute = evt.minute;
+        });
+
+        timepicker.on('close', function(evt) {
+          setAlarm(hour, minute);
+        });
+
+    </script>
+  </body>
+</html>
