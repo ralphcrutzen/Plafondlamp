@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+
+<html>
+  
+  <head>
+    <title>Kies een kleur</title>
+  </head>
+
+  <body>
+    <h1>Kleur</h1>
+    <input id="colorpicker" type="color" value="#000000" onchange="showColor(this.value)" />
+
+    <script type="text/javascript">
+    
+      function showColor(newColor) {
+        sendToParticle('sendcolor', newColor)
+      }
+
+      function sendToParticle(func, val) {
+        var request = new XMLHttpRequest();
+        var dev_id = 'zet hier je devide-id';
+        var access = 'zet hier je access token';
+        var data = 'params='+val+'&access_token='+access;
+        var url = 'https://api.particle.io/v1/devices/' + dev_id + '/' + func + '/';
+        request.open('POST', url, true);
+        request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+        request.send(data);
+      }
+  
+    </script>
+  </body>
+</html>
